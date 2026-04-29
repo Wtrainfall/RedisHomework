@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <style>
+        /* 保留之前的所有 CSS 样式 */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 帖子列表 -->
+        <div id="posts-container">
+            {% if posts %}
+                {% for post in posts %}
+                <div class="post-card" data-post-id="{{ post.postId }}">
+                    <div class="post-header">
+                        
+                        <div class="post-author">
+                            <div class="author-info">
+                                <span class="author-name">用户{{ post.publisherId }}</span>
+                                <span class="post-time">{{ post.pubDate }}</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="post-content">{{ post.postContent }}</div>
+                    <div class="post-actions">
+                        <div class="post-action-btn">点赞</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <h3>暂无帖子</h3>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

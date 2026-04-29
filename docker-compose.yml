@@ -27,6 +27,7 @@ services:
       - ./data:/app/data
       - ./src:/app/src
       - ./run.py:/app/run.py
+      - ./templates:/app/templates
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379

@@ -1,6 +1,4 @@
 from src.model import getDatabase, User, Post, Follower, Like, Browse
-from flask import jsonify, has_request_context
-
 class DBQueryService:
 
     def __init__(self):
@@ -23,10 +21,7 @@ class DBQueryService:
             'followingId': following
         }
 
-        if not has_request_context():
-            return data
-            
-        return jsonify(data)
+        return data
 
     def getFollowers(self, user_id):
         '''
@@ -43,9 +38,7 @@ class DBQueryService:
         'followerId': followers
         }
 
-        if not has_request_context():
-            return data
-        return jsonify(data)
+        return data 
 
     def getPostInfo(self, post_id):
 
@@ -59,12 +52,11 @@ class DBQueryService:
         data = {
             'postId': post.postId,
             'postContent': post.postContent,
-            'publisherId': post.postPublisher
+            'publisherId': post.postPublisher,
+            'pubDate': post.pubDate
         }
 
-        if not has_request_context():
-            return data
-        return jsonify(data)
+        return data
 
         
     def getLikesInfo(self, post_id=None, user_id=None):
@@ -85,9 +77,7 @@ class DBQueryService:
                 'likePostId': [like.postId for like in likes]
             }
         
-        if not has_request_context():
-            return data
-        return jsonify(data)
+        return data
 
     def getBrowseInfo(self, user_id):
         browse = self.db.query(Browse).filter(
@@ -98,9 +88,7 @@ class DBQueryService:
             'browsePostId': [browse.postId for browse in browse]
         }
 
-        if not has_request_context():
-            return data
-        return jsonify(data)
+        return data
 
 
 if __name__ == '__main__':

@@ -21,3 +21,11 @@ class RedisClient:
         if self._client is None:
             return self.connect()
         return self._client
+
+def getRedisClient():
+    return RedisClient().get_client()
+    
+def clearRedisCache():
+    client = getRedisClient()
+    client.flushdb()
+    
