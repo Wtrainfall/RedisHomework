@@ -34,8 +34,10 @@ class CacheService:
                 Follower.idolId == user_id
             ).all()
         followers = [str(row[0]) for row in rows]
-        self.redis.sadd(f"user:followers:set:{user_id}", *followers)
-        self.redis.expire(f"user:followers:set:{user_id}", 600)
+        if followers:
+            self.redis.sadd(f"user:followers:set:{user_id}", *followers)
+            self.redis.expire(f"user:followers:set:{user_id}", 600)
+
         self._closeDB()
         return followers
 
@@ -44,8 +46,10 @@ class CacheService:
                 Follower.fansId == user_id
             ).all()
         following = [str(row[0]) for row in rows]
-        self.redis.sadd(f"user:following:set:{user_id}", *following)
-        self.redis.expire(f"user:following:set:{user_id}", 600)
+        if following:
+            self.redis.sadd(f"user:following:set:{user_id}", *following)
+            self.redis.expire(f"user:following:set:{user_id}", 600)
+
         self._closeDB()
         return following
 

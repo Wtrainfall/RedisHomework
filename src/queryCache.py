@@ -1,6 +1,7 @@
 from src.cache import CacheService
 from src.redis import getRedisClient, clearRedisCache
 from src.model import getDatabase, User, Post, Follower, Like, Browse
+from src.filter import UserBloomFilter
 
 class CacheQueryService:
 
@@ -79,6 +80,19 @@ class CacheQueryService:
         common_counts.sort(key=lambda x: x[1], reverse=True)
         return common_counts[:3]
 
+    def getFollowers(self, user_id):
+
+        bf = UserBloomFilter()
+        if not bf.exists(user_id):
+            return None
+
+        if self.redis.exists(f"user:followers:set:{user_id}"):
+            followers = self.redis.smembers(f"user:followers:set:{user_id}")
+        else:
+            followers = self.cache.followers(user_id)
+        
+        return followers
+
 if __name__ == '__main__':
     queryService = CacheQueryService()
     print(queryService.getFriends(1))
@@ -86,3 +100,4 @@ if __name__ == '__main__':
     print(queryService.getLikeCounts(1))
     print(queryService.getTopLike())
     print(queryService.getSameFollowing(1))
+    print(queryService.getFollowers(4))
