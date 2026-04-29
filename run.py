@@ -1,6 +1,6 @@
 from flask import Flask
 from flask import render_template
-from src.query import DBQueryService
+from src.queryDB import DBQueryService
 import os
 
 base_dir = os.path.abspath(os.path.dirname(__file__))

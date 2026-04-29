@@ -1,4 +1,5 @@
 from src.model import getDatabase, User, Post, Follower, Like, Browse
+
 class DBQueryService:
 
     def __init__(self):
@@ -90,7 +91,6 @@ class DBQueryService:
 
         return data
 
-
 if __name__ == '__main__':
     queryService = DBQueryService()
     print(queryService.getFollowers(1))
@@ -99,5 +99,6 @@ if __name__ == '__main__':
     print(queryService.getLikesInfo(post_id=1))
     print(queryService.getLikesInfo(user_id=1))
     print(queryService.getBrowseInfo(1))
+    queryService._closeDatabase()
 
 
