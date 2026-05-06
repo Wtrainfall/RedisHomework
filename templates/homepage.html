@@ -10,17 +10,17 @@
             <div class="card-title">快捷导航</div>
             <div class="sidebar-item">
                 <a href="/" class="sidebar-link">
-                    <span>🏠</span> 首页
+                    <span></span> 首页
                 </a>
             </div>
             <div class="sidebar-item">
                 <a href="/profile/{{ current_user_id }}" class="sidebar-link">
-                    <span>👤</span> 我的主页
+                    <span></span> 我的主页
                 </a>
             </div>
             <div class="sidebar-item">
                 <a href="#" class="sidebar-link" onclick="loadFriends(); return false;">
-                    <span>👥</span> 我的好友
+                    <span></span> 我的好友
                 </a>
             </div>
         </div>
@@ -77,22 +77,12 @@
     <!-- 右侧边栏 -->
     <div class="sidebar-right">
         <div class="card">
-            <div class="card-title">🔥 热门帖子</div>
+            <div class="card-title"> 热门帖子</div>
             <div id="top-posts">
                 <div class="empty-state">
                     <p>加载中...</p>
                 </div>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">关于平台</div>
-            <p style="font-size: 14px; color: #666; line-height: 1.6;">
-                本社交平台使用 Redis 缓存技术优化性能，包括：<br><br>
-                • Bitmap 存储点赞状态<br>
-                • Set 存储关注关系<br>
-                • 布隆过滤器防止缓存穿透
-            </p>
         </div>
     </div>
 </div>

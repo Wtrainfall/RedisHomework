@@ -200,6 +200,7 @@ def api_like():
         cache_service = CacheService()
 
         if existing:
+            cache_service.removeLike(current_user_id, post_id)
             db.delete(existing)
             db.commit()
             return jsonify({'success': True, 'action': 'unlike', 'message': '取消点赞成功'})
@@ -207,9 +208,12 @@ def api_like():
             like = Like(userId=current_user_id, postId=post_id)
             db.add(like)
             db.commit()
+            cache_service.addLike(current_user_id, post_id)
+            
             return jsonify({'success': True, 'action': 'like', 'message': '点赞成功'})
     finally:
         db.close()
+
 
 @app.route('/api/follow', methods=['POST'])
 @login_required
@@ -222,13 +226,17 @@ def api_follow():
         return jsonify({'success': False, 'message': '参数错误'})
 
     db = getDatabase()
+
     try:
         existing = db.query(Follower).filter(
             Follower.fansId == current_user_id,
             Follower.idolId == target_user_id
         ).first()
+        
+        cache_service = CacheService()
 
         if existing:
+            cache_service.removeFollowing(current_user_id, target_user_id)
             db.delete(existing)
             db.commit()
             return jsonify({'success': True, 'action': 'unfollow', 'message': '取消关注成功'})
@@ -236,6 +244,7 @@ def api_follow():
             follow = Follower(fansId=current_user_id, idolId=target_user_id)
             db.add(follow)
             db.commit()
+            cache_service.addFollowing(current_user_id, target_user_id)
             return jsonify({'success': True, 'action': 'follow', 'message': '关注成功'})
     finally:
         db.close()

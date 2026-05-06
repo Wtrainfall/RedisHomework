@@ -60,7 +60,39 @@ class CacheService:
         self.redis.expire(f"user:followers:count:{user_id}", 600)
         self._closeDB()
         return followers_count
-    
+
+    def addLike(self, user_id, post_id):
+        pipe = self.redis.pipeline()
+        pipe.setbit(f"post:likes:bitmap:{post_id}", user_id, 1)
+        pipe.incr(f"post:likes:count:{post_id}")
+        pipe.execute()
+        self.redis.expire(f"post:likes:bitmap:{post_id}", 600)
+        self.redis.expire(f"post:likes:count:{post_id}", 600)
+
+    def removeLike(self, user_id, post_id):
+        pipe = self.redis.pipeline()
+        pipe.setbit(f"post:likes:bitmap:{post_id}", user_id, 0)
+        pipe.decr(f"post:likes:count:{post_id}")
+        pipe.execute()
+        self.redis.expire(f"post:likes:bitmap:{post_id}", 600)
+        self.redis.expire(f"post:likes:count:{post_id}", 600)
+
+    def addFollowing(self, fans_id, idol_id):
+        pipe = self.redis.pipeline()
+        pipe.sadd(f"user:following:set:{fans_id}", idol_id)
+        pipe.sadd(f"user:followers:set:{idol_id}", fans_id)
+        pipe.execute()
+        self.redis.expire(f"user:following:set:{fans_id}", 600)
+        self.redis.expire(f"user:followers:set:{idol_id}", 600)
+
+    def removeFollowing(self, fans_id, idol_id):
+        pipe = self.redis.pipeline()
+        pipe.srem(f"user:following:set:{fans_id}", idol_id)
+        pipe.srem(f"user:followers:set:{idol_id}", fans_id)
+        pipe.execute()
+        self.redis.expire(f"user:following:set:{fans_id}", 600)
+        self.redis.expire(f"user:followers:set:{idol_id}", 600)
+
     def clearCache(self):
         clearRedisCache()
 
