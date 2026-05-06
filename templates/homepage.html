@@ -1,41 +1,206 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>首页</title>
-    <style>
-        /* 保留之前的所有 CSS 样式 */
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- 帖子列表 -->
-        <div id="posts-container">
-            {% if posts %}
-                {% for post in posts %}
-                <div class="post-card" data-post-id="{{ post.postId }}">
-                    <div class="post-header">
-                        
-                        <div class="post-author">
-                            <div class="author-info">
-                                <span class="author-name">用户{{ post.publisherId }}</span>
-                                <span class="post-time">{{ post.pubDate }}</span>
-                            </div>
-                        </div>
+{% extends "base.html" %}
 
-                    </div>
-                    <div class="post-content">{{ post.postContent }}</div>
-                    <div class="post-actions">
-                        <div class="post-action-btn">点赞</div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
+{% block title %}首页 - 社交平台{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- 左侧边栏 -->
+    <div class="sidebar-left">
+        <div class="card">
+            <div class="card-title">快捷导航</div>
+            <div class="sidebar-item">
+                <a href="/" class="sidebar-link">
+                    <span>🏠</span> 首页
+                </a>
+            </div>
+            <div class="sidebar-item">
+                <a href="/profile/{{ current_user_id }}" class="sidebar-link">
+                    <span>👤</span> 我的主页
+                </a>
+            </div>
+            <div class="sidebar-item">
+                <a href="#" class="sidebar-link" onclick="loadFriends(); return false;">
+                    <span>👥</span> 我的好友
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">推荐关注</div>
+            <div id="recommend-list">
                 <div class="empty-state">
-                    <h3>暂无帖子</h3>
+                    <p>加载中...</p>
                 </div>
-            {% endif %}
+            </div>
         </div>
     </div>
-</body>
-</html>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        {% if posts %}
+            {% for post in posts %}
+            <div class="post-card" data-post-id="{{ post.postId }}">
+                <div class="post-header">
+                    <div class="post-author">
+                        <div class="avatar">{{ post.publisherName[0]|upper }}</div>
+                        <div class="author-info">
+                            <a href="/profile/{{ post.publisherId }}" class="author-name">{{ post.publisherName }}</a>
+                            <span class="post-time">{{ post.pubDate }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content">{{ post.postContent }}</div>
+                <div class="post-actions">
+                    <button class="action-btn {% if post.isLiked %}liked{% endif %}" onclick="toggleLike({{ post.postId }}, this)">
+                        <svg viewBox="0 0 24 24" fill="{% if post.isLiked %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        <span class="like-count">{{ post.likeCount }}</span>
+                    </button>
+                    <a href="/post/{{ post.postId }}" class="action-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                        查看详情
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>暂无帖子</h3>
+                <p>关注更多用户，获取更多精彩内容</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 右侧边栏 -->
+    <div class="sidebar-right">
+        <div class="card">
+            <div class="card-title">🔥 热门帖子</div>
+            <div id="top-posts">
+                <div class="empty-state">
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">关于平台</div>
+            <p style="font-size: 14px; color: #666; line-height: 1.6;">
+                本社交平台使用 Redis 缓存技术优化性能，包括：<br><br>
+                • Bitmap 存储点赞状态<br>
+                • Set 存储关注关系<br>
+                • 布隆过滤器防止缓存穿透
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- 好友列表弹窗 -->
+<div id="friends-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 8px; padding: 30px; max-width: 400px; width: 90%; max-height: 500px; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 18px;">我的好友</h3>
+            <button onclick="closeFriendsModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+        <div id="friends-list"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 加载热门帖子
+    function loadTopPosts() {
+        fetch('/api/top-likes')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('top-posts');
+                if (data.success && data.data.length > 0) {
+                    container.innerHTML = data.data.map((post, index) => `
+                        <div class="sidebar-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="flex: 1;">
+                                    <a href="/post/${post.postId}" style="color: #333; text-decoration: none; font-size: 14px; display: block; margin-bottom: 4px;">
+                                        ${index + 1}. ${post.postContent}
+                                    </a>
+                                    <span style="font-size: 12px; color: #999;">${post.publisherName}</span>
+                                </div>
+                                <span style="color: #ff4d4f; font-size: 13px;">❤ ${post.likeCount}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><p>暂无数据</p></div>';
+                }
+            });
+    }
+
+    // 加载推荐用户
+    function loadRecommendUsers() {
+        fetch('/api/recommend-users')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('recommend-list');
+                if (data.success && data.data.length > 0) {
+                    container.innerHTML = data.data.map(user => `
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">${user.username[0].toUpperCase()}</div>
+                                <div>
+                                    <a href="/profile/${user.userId}" class="user-name">${user.username}</a>
+                                    <div class="user-meta">${user.commonCount} 个共同关注</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><p>暂无推荐</p></div>';
+                }
+            });
+    }
+
+    // 加载好友列表
+    function loadFriends() {
+        fetch('/api/friends')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('friends-list');
+                const modal = document.getElementById('friends-modal');
+
+                if (data.success && data.data.length > 0) {
+                    container.innerHTML = data.data.map(user => `
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="avatar" style="width: 40px; height: 40px; font-size: 16px;">${user.username[0].toUpperCase()}</div>
+                                <a href="/profile/${user.userId}" class="user-name">${user.username}</a>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><p>暂无好友</p></div>';
+                }
+
+                modal.style.display = 'flex';
+            });
+    }
+
+    function closeFriendsModal() {
+        document.getElementById('friends-modal').style.display = 'none';
+    }
+
+    // 点击模态框外部关闭
+    document.getElementById('friends-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeFriendsModal();
+        }
+    });
+
+    // 页面加载完成后加载数据
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTopPosts();
+        loadRecommendUsers();
+    });
+</script>
+{% endblock %}

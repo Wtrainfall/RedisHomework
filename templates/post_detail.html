@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}帖子详情 - 社交平台{% endblock %}
+
+{% block content %}
+<div class="container" style="grid-template-columns: 1fr; max-width: 800px;">
+    <div class="post-card">
+        <div class="post-header">
+            <div class="post-author">
+                <div class="avatar">{{ post.publisherName[0]|upper }}</div>
+                <div class="author-info">
+                    <a href="/profile/{{ post.publisherId }}" class="author-name">{{ post.publisherName }}</a>
+                    <span class="post-time">{{ post.pubDate }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="post-content" style="font-size: 16px; line-height: 1.8;">{{ post.postContent }}</div>
+
+        <div class="post-actions">
+            <button class="action-btn {% if post.isLiked %}liked{% endif %}" onclick="toggleLike({{ post.postId }}, this)">
+                <svg viewBox="0 0 24 24" fill="{% if post.isLiked %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <span class="like-count">{{ post.likeCount }}</span>
+            </button>
+
+            <a href="/" class="action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                返回首页
+            </a>
+        </div>
+    </div>
+
+    <!-- 帖子统计 -->
+    <div class="card">
+        <div class="card-title">帖子统计</div>
+        <div style="display: flex; gap: 30px;">
+            <div class="stat-item">
+                <div class="stat-value">{{ post.likeCount }}</div>
+                <div class="stat-label">点赞数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ post.publisherId }}</div>
+                <div class="stat-label">作者ID</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ post.postId }}</div>
+                <div class="stat-label">帖子ID</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 作者信息 -->
+    <div class="card">
+        <div class="card-title">关于作者</div>
+        <div class="user-item">
+            <div class="user-info">
+                <div class="avatar" style="width: 50px; height: 50px; font-size: 20px;">{{ post.publisherName[0]|upper }}</div>
+                <div>
+                    <a href="/profile/{{ post.publisherId }}" class="user-name" style="font-size: 16px;">{{ post.publisherName }}</a>
+                    <div class="user-meta">查看作者主页了解更多内容</div>
+                </div>
+            </div>
+            <a href="/profile/{{ post.publisherId }}" class="btn btn-outline">查看主页</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

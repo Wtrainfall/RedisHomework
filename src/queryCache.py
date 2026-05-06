@@ -93,6 +93,19 @@ class CacheQueryService:
         
         return followers
 
+    def getFollowing(self, user_id):
+
+        bf = UserBloomFilter()
+        if not bf.exists(user_id):
+            return None
+
+        if self.redis.exists(f"user:following:set:{user_id}"):
+            following = self.redis.smembers(f"user:following:set:{user_id}")
+        else:
+            following = self.cache.following(user_id)
+        
+        return following
+
 if __name__ == '__main__':
     queryService = CacheQueryService()
     print(queryService.getFriends(1))

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}注册 - 社交平台{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h1 class="auth-title">用户注册</h1>
+
+    {% if error %}
+    <div class="form-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/register">
+        <div class="form-group">
+            <label class="form-label">用户名</label>
+            <input type="text" name="username" class="form-input" placeholder="请输入用户名" required>
+        </div>
+
+        <button type="submit" class="form-btn">注册</button>
+    </form>
+
+    <div class="form-link">
+        已有账号？<a href="/login">立即登录</a>
+    </div>
+</div>
+{% endblock %}
