@@ -462,7 +462,6 @@
             <a href="/" class="nav-brand">社交平台</a>
             <div class="nav-links">
                 <a href="/">首页</a>
-                <a href="/api/top-likes">热门</a>
                 <div class="nav-user">
                     <a href="/profile/{{ session.user_id }}">{{ session.username }}</a>
                     <a href="/logout">退出</a>
@@ -535,6 +534,7 @@
                         btn.textContent = '+ 关注';
                         showToast('取消关注');
                     }
+                    location.reload();
                 }
             });
         }
